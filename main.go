@@ -19,7 +19,6 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-
 	mux.HandleFunc("/sendemail/{tip}", SendEmail)
 
 	c := cors.New(cors.Options{
@@ -56,7 +55,6 @@ func SendEmail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	defer rows.Close()
-
 	for rows.Next() {
 		var id int
 		var email, t string
@@ -84,6 +82,8 @@ func SendEmail(w http.ResponseWriter, r *http.Request) {
 		err := smtp.SendMail(smtpServer+":"+port, auth, username, []string{email}, []byte(message))
 		if err != nil {
 			fmt.Fprintf(w, "%s", "Eroare la trimitere email!"+err.Error())
+		} else {
+			fmt.Fprintf(w, "%s%s%s%s%s\r\n", "Email catre ", email, " de tip ", tip, " trimis cu succes!")
 		}
 
 		//fmt.Println(id, email, tip)
