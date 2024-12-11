@@ -16,6 +16,7 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
 	github.com/googleapis/gax-go/v2 v2.14.0 // indirect
+	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.54.0 // indirect
 	go.opentelemetry.io/otel v1.29.0 // indirect
@@ -37,4 +38,5 @@ require (
 	cloud.google.com/go/cloudsqlconn v1.13.1
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/rs/cors v1.11.1
+	github.com/sendgrid/sendgrid-go v3.16.0+incompatible
 )

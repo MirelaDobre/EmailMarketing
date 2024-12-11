@@ -1,9 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/smtp"
 
 	"github.com/rs/cors"
 )
@@ -20,7 +20,7 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/sendemail", SendEmail)
+	mux.HandleFunc("/sendemail/{tip}", SendEmail)
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
@@ -40,19 +40,55 @@ func main() {
 
 func SendEmail(w http.ResponseWriter, r *http.Request) {
 	// Send email code here
+	tip := r.PathValue("tip")
 
-	type respT struct {
-		Success bool   `json:"success"`
-		Message string `json:"message"`
+	q := "SELECT id, email, tip FROM email WHERE tip=?"
+	if tip != "craciun" && tip != "oferte" {
+		fmt.Fprintf(w, "%s", "Tip invalid!")
+		return
 	}
 
-	resp := respT{
-		Success: false,
-		Message: "Inca nu!",
+	rows, err := Db.Query(q, tip)
+
+	if err != nil {
+		fmt.Fprintf(w, "%s", "Eroare la interogare baza de date!")
+		return
 	}
 
-	j, _ := json.Marshal(resp)
-	w.Header().Add("Content-Type", "application/json")
-	fmt.Fprintf(w, "%s", string(j))
+	defer rows.Close()
+
+	for rows.Next() {
+		var id int
+		var email, t string
+		err = rows.Scan(&id, &email, &t)
+		if err != nil {
+			fmt.Fprintf(w, "%s", "Eroare la citirea datelor!"+err.Error())
+			return
+		}
+
+		smtpServer := "smtp.gmail.com"
+		port := "587"
+		username := "daniel.vacaretu@gmail.com"
+		password := "cccv lrsu lhnz ylqd"
+
+		// Email headers and body
+		headers := "From: " + username + "\r\n" +
+			"To: " + email + "\r\n" +
+			"Subject: Email Marketing \r\n" +
+			"MIME-Version: 1.0\r\n" +
+			"Content-Type: text/html; charset=\"UTF-8\"\r\n\r\n"
+		message := headers + GetEmail(tip)
+
+		// Send email
+		auth := smtp.PlainAuth("", username, password, smtpServer)
+		err := smtp.SendMail(smtpServer+":"+port, auth, username, []string{email}, []byte(message))
+		if err != nil {
+			fmt.Fprintf(w, "%s", "Eroare la trimitere email!"+err.Error())
+		}
+
+		//fmt.Println(id, email, tip)
+	}
+
+	fmt.Fprintf(w, "%s", "Email-uri trimise cu succes!")
 
 }
