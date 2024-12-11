@@ -66,8 +66,8 @@ func SendEmail(w http.ResponseWriter, r *http.Request) {
 
 		smtpServer := "smtp.gmail.com"
 		port := "587"
-		username := "daniel.vacaretu@gmail.com"
-		password := "cccv lrsu lhnz ylqd"
+		username := "alexm.dobre@gmail.com"
+		password := "atfq nkbb jfoo zhnd"
 
 		// Email headers and body
 		headers := "From: " + username + "\r\n" +
